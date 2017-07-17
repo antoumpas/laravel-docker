@@ -1,0 +1,50 @@
+version: '2'
+services:
+    web:
+        build:
+            context: ./
+            dockerfile: docker/web.docker
+        volumes:
+            - ./:/var/www
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - app
+    app:
+        build:
+            context: ./
+            dockerfile: docker/app.docker
+        volumes:
+            - ./:/var/www
+            - ./:/etc/nginx/conf.d
+            - ./:/var/log/supervisor
+        links:
+            - mysql
+            - redis
+            - beanstalk
+            - cache
+        environment:
+            - "DB_PORT=3306"
+            - "DB_HOST=mysql"
+            - "REDIS_PORT=6379"
+            - "REDIS_HOST=redis"
+    mysql:
+        image: mysql:5.6
+        environment:
+            - "MYSQL_ROOT_PASSWORD=secret"
+            - "MYSQL_DATABASE=docker"
+        ports:
+            - "3306:3306"
+    redis:
+        image: redis:3.0
+        ports:
+            - "6379:6379"
+    beanstalk:
+        image: schickling/beanstalkd
+        ports:
+            -  "11300:11300"
+    cache:
+        image: memcached:alpine
+        ports:
+            - "11211:11211"
