@@ -9,6 +9,7 @@ services:
         ports:
             - "80:80"
             - "443:443"
+            - "9000:9000"
         links:
             - app
     app:
@@ -17,8 +18,6 @@ services:
             dockerfile: docker/app.docker
         volumes:
             - ./:/var/www
-            - ./:/etc/nginx/conf.d
-            - ./:/var/log/supervisor
         links:
             - mysql
             - redis
@@ -30,7 +29,7 @@ services:
             - "REDIS_PORT=6379"
             - "REDIS_HOST=redis"
     mysql:
-        image: mysql:5.6
+        image: mysql:5.7.18
         environment:
             - "MYSQL_ROOT_PASSWORD=secret"
             - "MYSQL_DATABASE=docker"
